@@ -13,12 +13,6 @@ public class BoxClick : MonoBehaviour
 
     void OnMouseDown()
     {
-        if (slotManager == null)
-        {
-            Debug.LogError("No SlotManager in scene");
-            return;
-        }
-
         slotManager.TryAddBox(box);
     }
 }

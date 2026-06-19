@@ -4,12 +4,9 @@ public class BoxSpawner : MonoBehaviour
 {
     public GameObject boxPrefab;
     public Transform[] spawnPoints;
-    public LevelManager levelManager;
     public void SpawnBoxes(LevelData levelData)
     {
         int count = levelData.boxes.Length;
-
-        levelManager.remainingBoxes = count;
 
         for (int i = 0; i < count; i++)
         {
@@ -17,7 +14,7 @@ public class BoxSpawner : MonoBehaviour
 
             Box box = obj.GetComponent<Box>();
             box.color = levelData.boxes[i].color;
-            box.target = levelData.boxes[i].amount;
+            box.target = 5;
         }
     }
 }

@@ -7,27 +7,69 @@ public class LevelManager : MonoBehaviour
     public TrackManager trackManager;
     public BoxSpawner boxSpawner;
 
+    public SlotManager slotManager;
+
     private Queue<PixelColor> pixelQueue = new Queue<PixelColor>();
 
     public int remainingBoxes;
 
     public void InitLevel()
     {
+        CleanupLevel();
+
         boxSpawner.SpawnBoxes(levelData);
 
         GeneratePixels(levelData);
-
+        remainingBoxes = levelData.boxes.Length;
         FillTrack();
     }
 
-    void GeneratePixels(LevelData level)
+    private void CleanupLevel()
+    {
+        // 1. Destroy all boxes
+        Box[] existingBoxes = FindObjectsByType<Box>(FindObjectsSortMode.None);
+        foreach (var b in existingBoxes)
+        {
+            if (b != null) Destroy(b.gameObject);
+        }
+
+        // 2. Destroy all pixels
+        Pixel[] existingPixels = FindObjectsByType<Pixel>(FindObjectsSortMode.None);
+        foreach (var p in existingPixels)
+        {
+            if (p != null) Destroy(p.gameObject);
+        }
+
+        // 3. Clear slot manager slots
+        if (slotManager == null)
+        {
+            slotManager = FindFirstObjectByType<SlotManager>();
+        }
+        if (slotManager != null)
+        {
+            foreach (var slot in slotManager.slots)
+            {
+                slot.Clear();
+            }
+            slotManager.activeSlot = 0;
+        }
+
+        // 4. Clear track manager lists
+        if (trackManager != null)
+        {
+            trackManager.activePixels.Clear();
+            trackManager.waitingPixels.Clear();
+        }
+    }
+
+    private void GeneratePixels(LevelData level)
     {
         pixelQueue.Clear();
         List<PixelColor> tempList = new List<PixelColor>();
 
         foreach (var box in level.boxes)
         {
-            for (int i = 0; i < box.amount; i++)
+            for (int i = 0; i < 5; i++)
             {
                 tempList.Add(box.color);
             }
@@ -58,7 +100,7 @@ public class LevelManager : MonoBehaviour
         return pixelQueue.Dequeue();
     }
 
-    void FillTrack()
+    private void FillTrack()
     {
         if (trackManager != null)
         {
@@ -70,14 +112,12 @@ public class LevelManager : MonoBehaviour
     {
         FillTrack();
     }
-
     public void OnBoxCompleted(Box box)
     {
         remainingBoxes--;
-
         if (remainingBoxes <= 0)
         {
-            Debug.Log("LEVEL COMPLETE!");
+            GameManager.Instance.WinGame();
         }
     }
 }

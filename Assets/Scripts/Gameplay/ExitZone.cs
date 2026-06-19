@@ -4,6 +4,8 @@ public class ExitZone : MonoBehaviour
 {
     public SlotManager slotManager;
     public LevelManager levelManager;
+    private float lastSuckTime;
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         Pixel pixel = other.GetComponent<Pixel>();
@@ -13,10 +15,8 @@ public class ExitZone : MonoBehaviour
         {
             if (slot.box == null) continue;
 
-            // Check if color matches and the box still needs more pixels (including ones in flight)
             if (IsMatch(slot.box.color, pixel.color) && slot.box.current + slot.box.pixelsInFlight < slot.box.target)
             {
-                // Remove pixel from TrackManager immediately so it's not positioned/updated by track rotation
                 if (levelManager != null && levelManager.trackManager != null)
                 {
                     levelManager.trackManager.RemovePixel(pixel);
@@ -25,7 +25,6 @@ public class ExitZone : MonoBehaviour
                 Box targetBox = slot.box;
                 targetBox.pixelsInFlight++;
 
-                // Start sucking animation
                 pixel.StartSucking(targetBox.transform, () =>
                 {
                     if (targetBox != null)
@@ -45,12 +44,18 @@ public class ExitZone : MonoBehaviour
                     }
                 });
 
+                if(Time.time - lastSuckTime > 0.05f)
+                {
+                    SoundManager.Instance.PlaySuck();
+                    lastSuckTime = Time.time;
+                }
+
                 return;
             }
         }
     }
 
-    bool IsMatch(PixelColor boxColor, PixelColor pixelColor)
+    private bool IsMatch(PixelColor boxColor, PixelColor pixelColor)
     {
         return boxColor == pixelColor;
     }

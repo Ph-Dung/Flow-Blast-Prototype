@@ -23,7 +23,6 @@ public class TrackManager : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("TRACK START");
         TrySpawn();
     }
 
@@ -83,13 +82,6 @@ public class TrackManager : MonoBehaviour
         }
     }
 
-    public void AddPixel(Pixel pixel)
-    {
-        activePixels.Add(pixel);
-
-        UpdatePositions();
-    }
-
     public void RemovePixel(Pixel pixel)
     {
         activePixels.Remove(pixel);
@@ -98,7 +90,7 @@ public class TrackManager : MonoBehaviour
         TrySpawn();
     }
 
-    void UpdatePositions()
+    private void UpdatePositions()
     {
         activePixels.RemoveAll(p => p == null);
 
@@ -112,7 +104,7 @@ public class TrackManager : MonoBehaviour
         }
     }
 
-    Vector3 GetCirclePosition(float angle)
+    private Vector3 GetCirclePosition(float angle)
     {
         float radius = 1.5f;
 

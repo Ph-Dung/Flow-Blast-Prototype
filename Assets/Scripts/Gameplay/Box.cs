@@ -10,6 +10,7 @@ public class Box : MonoBehaviour
 
     private LevelManager levelManager;
 
+    private Vector3 originalPosition;
     private Vector3 targetPosition;
     private bool hasTargetPosition = false;
     public float moveSpeed = 10f;
@@ -19,6 +20,7 @@ public class Box : MonoBehaviour
         GetComponent<SpriteRenderer>().color = GetUnityColor(color);
 
         levelManager = FindFirstObjectByType<LevelManager>();
+        originalPosition = transform.position;
         targetPosition = transform.position;
     }
 
@@ -26,6 +28,11 @@ public class Box : MonoBehaviour
     {
         targetPosition = pos;
         hasTargetPosition = true;
+    }
+
+    public void ReturnToBoard()
+    {
+        MoveTo(originalPosition);
     }
 
     void Update()
@@ -43,7 +50,6 @@ public class Box : MonoBehaviour
     public void AddPixel()
     {
         current++;
-
         if (IsComplete)
         {
             levelManager.OnBoxCompleted(this);

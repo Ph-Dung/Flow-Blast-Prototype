@@ -4,7 +4,6 @@ using UnityEngine;
 public class BoxData
 {
     public PixelColor color;
-    public int amount;
 }
 
 [CreateAssetMenu(menuName = "Game/Level")]

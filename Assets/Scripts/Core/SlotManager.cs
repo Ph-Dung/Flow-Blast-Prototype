@@ -5,10 +5,12 @@ public class SlotManager : MonoBehaviour
 {
     public List<ActiveSlot> slots = new List<ActiveSlot>();
     public Transform[] slotPositions;
+    private int maxSlots = 3;
+    public int activeSlot = 0;
 
     void Awake()
     {
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < maxSlots; i++)
         {
             slots.Add(new ActiveSlot());
         }
@@ -33,23 +35,12 @@ public class SlotManager : MonoBehaviour
             if (slot.IsEmpty)
             {
                 slot.box = box;
-                Debug.Log($"Box {box.color} assigned to slot {i}");
-
-                if (slotPositions != null && i < slotPositions.Length && slotPositions[i] != null)
-                {
-                    box.MoveTo(slotPositions[i].position);
-                }
-                else
-                {
-                    // Fallback relative to SlotManager transform position
-                    Vector3 fallbackPos = transform.position + new Vector3((i - 1) * 1.5f, 0, 0);
-                    box.MoveTo(fallbackPos);
-                }
-
+                box.MoveTo(slotPositions[i].position);
+                activeSlot++;
+                SoundManager.Instance.PlayClick();
                 return true;
             }
         }
-
         Debug.Log("No empty slot!");
         return false;
     }
@@ -61,6 +52,7 @@ public class SlotManager : MonoBehaviour
             if (slot.box == box)
             {
                 slot.Clear();
+                activeSlot--;
                 if (box != null)
                 {
                     Destroy(box.gameObject);
@@ -68,6 +60,23 @@ public class SlotManager : MonoBehaviour
                 return;
             }
         }
+    }
+
+    public bool ReviveOneSlot()
+    {
+        for (int i = slots.Count - 1; i >= 0; i--)
+        {
+            var slot = slots[i];
+            if (!slot.IsEmpty && slot.box != null)
+            {
+                Box box = slot.box;
+                slot.Clear();
+                activeSlot--;
+                box.ReturnToBoard();
+                return true;
+            }
+        }
+        return false;
     }
     private void OnDrawGizmos()
     {
